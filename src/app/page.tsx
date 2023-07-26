@@ -102,24 +102,28 @@ export default function Home() {
           </li>
         </ul>
       </nav>
-      <section className="grid w-full grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
-        {matches.map((book) => (
-          <div
-            key={book.ISBN}
-            className="grid cursor-pointer grid-rows-[auto,1fr] gap-4"
-            onClick={() => handleToggleFromReadList(book)}
-          >
-            <img
-              alt={book.title}
-              className="aspect-[9/14] w-full bg-gray-800 object-cover"
-              src={book.cover}
-            />
-            <p className="text-xl">
-              {readList.has(book.ISBN) && <span>✦</span>} {book.title}
-            </p>
-          </div>
-        ))}
-      </section>
+      {matches.length ? (
+        <section className="grid w-full grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+          {matches.map((book) => (
+            <div
+              key={book.ISBN}
+              className="grid cursor-pointer grid-rows-[auto,1fr] gap-4"
+              onClick={() => handleToggleFromReadList(book)}
+            >
+              <img
+                alt={book.title}
+                className="aspect-[9/14] w-full bg-gray-800 object-cover"
+                src={book.cover}
+              />
+              <p className="text-xl">
+                {readList.has(book.ISBN) && <span>✦</span>} {book.title}
+              </p>
+            </div>
+          ))}
+        </section>
+      ) : (
+        <p className="w-full py-8 text-center opacity-50">No hay resultados</p>
+      )}
     </article>
   );
 }
