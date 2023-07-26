@@ -31,7 +31,9 @@ const api = {
 };
 
 export default function Home() {
-  const [readList, setReadList] = useState<Set<Book["ISBN"]>>(api.readList.fetch);
+  const [readList, setReadList] = useState<Set<Book["ISBN"]>>(() =>
+    typeof window !== "undefined" ? api.readList.fetch() : new Set(),
+  );
   const [genre, setGenre] = useState<string>("");
   const [view, setView] = useState<"available" | "readlist">("available");
   const genres = useMemo(() => {
