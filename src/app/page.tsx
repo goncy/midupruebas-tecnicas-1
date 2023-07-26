@@ -1,51 +1,113 @@
 "use client";
 
-import {useSnapshot} from "valtio";
+import {useEffect, useMemo, useState} from "react";
 
-import {setGenreFilter, state, toggleFromReadList, toggleListFilter} from "@/state";
+import {library} from "../books.json";
+
+// Normalize data from JSON
+const books = library.map((item) => item.book);
+
+// Types
+interface Book {
+  title: string;
+  pages: number;
+  genre: string;
+  cover: string;
+  synopsis: string;
+  year: number;
+  ISBN: string;
+}
+
+// Resources
+const api = {
+  readList: {
+    // Fetch and parse read list from local storage
+    fetch: (): Set<Book["ISBN"]> =>
+      new Set(JSON.parse(window.localStorage.getItem("readList") || "[]") as Book["ISBN"][]),
+    // Update read list in local storage
+    update: (readList: Set<Book["ISBN"]>) =>
+      localStorage.setItem("readList", JSON.stringify(Array.from(readList))),
+  },
+};
 
 export default function Home() {
-  const {books, matches, filters, readList, genres} = useSnapshot(state);
+  const [readList, setReadList] = useState<Set<Book["ISBN"]>>(api.readList.fetch);
+  const [genre, setGenre] = useState<string>("");
+  const [view, setView] = useState<"available" | "readlist">("available");
+  const genres = useMemo(() => {
+    // Create a map to store the genres and their count
+    const map = new Map<string, number>();
+
+    for (const book of books) {
+      // If the genre is not in the map, add it with a count of 0
+      if (!map.has(book.genre)) map.set(book.genre, 0);
+
+      // If the filter is set to readlist and the book is not in the readlist, skip it
+      if (view === "readlist" && !readList.has(book.ISBN)) continue;
+
+      map.set(book.genre, map.get(book.genre)! + 1);
+    }
+
+    // Convert the map to an array of objects with label and count
+    return Array.from(map.entries()).map(([label, count]) => ({label, count}));
+  }, [readList, view]);
+  const matches = useMemo(() => {
+    // Early return if a book doesn't match the list or genre filters, return true otherwise
+    return books.filter((book) => {
+      if (view === "readlist" && !readList.has(book.ISBN)) return false;
+      if (genre && book.genre !== genre) return false;
+
+      return true;
+    });
+  }, [genre, readList, view]);
+
+  function handleToggleFromReadList(book: Book) {
+    const draft = structuredClone(readList);
+
+    if (draft.has(book.ISBN)) {
+      draft.delete(book.ISBN);
+    } else {
+      draft.add(book.ISBN);
+    }
+
+    setReadList(draft);
+  }
+
+  useEffect(() => {
+    api.readList.update(readList);
+  }, [readList]);
 
   return (
-    <article className="grid w-full gap-8">
-      <section className="grid gap-4">
-        <h2 className="text-2xl font-bold">Libros disponibles</h2>
-        <nav>
-          <ul className="inline-flex gap-4">
-            <li>
-              <select
-                value={filters.list}
-                onChange={(event) =>
-                  toggleListFilter(event.target.value as "available" | "readlist")
-                }
-              >
-                <option value="available">Disponibles ({books.length})</option>
-                <option value="readlist">Lista de lectura ({readList.size})</option>
-              </select>
-            </li>
-            <li>
-              <select
-                value={filters.genre}
-                onChange={(event) => setGenreFilter(event.target.value)}
-              >
-                <option value="">Todos</option>
-                {genres.map(({label, count}) => (
-                  <option key={label} value={label}>
-                    {label} ({count})
-                  </option>
-                ))}
-              </select>
-            </li>
-          </ul>
-        </nav>
-      </section>
+    <article className="grid w-full gap-4">
+      <nav>
+        <ul className="inline-flex gap-4">
+          <li>
+            <select
+              value={view}
+              onChange={(event) => setView(event.target.value as "available" | "readlist")}
+            >
+              <option value="available">Disponibles ({books.length})</option>
+              <option value="readlist">Lista de lectura ({readList.size})</option>
+            </select>
+          </li>
+          <li>
+            <select value={genre} onChange={(event) => setGenre(event.target.value)}>
+              <option value="">Todos</option>
+              {genres.map(({label, count}) => (
+                <option key={label} value={label}>
+                  {label} ({count})
+                </option>
+              ))}
+            </select>
+          </li>
+        </ul>
+      </nav>
       <section className="grid w-full grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
         {matches.map((book) => (
           <div
             key={book.ISBN}
             className="grid cursor-pointer grid-rows-[auto,1fr] gap-4"
-            onClick={() => toggleFromReadList(book)}
+            onClick={() => handleToggleFromReadList(book)}
           >
             <img
               alt={book.title}

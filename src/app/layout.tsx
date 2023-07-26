@@ -12,7 +12,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     <html lang="en">
       <body className="grid min-h-screen grid-rows-[60px,1fr,60px] gap-12">
         <header className="m-auto w-full max-w-screen-lg">
-          <nav>Libros</nav>
+          <h2 className="text-2xl">Libros</h2>
         </header>
         <main className="m-auto flex h-full  w-full max-w-screen-lg flex-col items-center justify-between">
           {children}
