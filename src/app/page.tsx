@@ -2,10 +2,10 @@
 
 import {useEffect, useMemo, useState} from "react";
 
-import {library} from "../books.json";
+import data from "../books.json";
 
 // Normalize data from JSON
-const books = library.map((item) => item.book);
+const books = data.library.map((item) => item.book);
 
 // Types
 interface Book {
