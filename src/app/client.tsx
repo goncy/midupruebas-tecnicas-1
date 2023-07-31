@@ -73,7 +73,7 @@ export default function HomeClient({books}: {books: Book[]}) {
 
   return (
     <article className="grid w-full gap-4">
-      <nav className="sticky top-0 bg-[Canvas] py-2">
+      <nav className="sticky top-0 z-10 bg-[Canvas] py-2">
         <ul className="inline-flex gap-4">
           <li>
             <select

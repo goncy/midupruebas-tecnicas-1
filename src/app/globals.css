@@ -7,3 +7,24 @@
   color: CanvasText;
   background-color: Canvas;
 }
+
+@keyframes show {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+img {
+  view-timeline-name: --image;
+  view-timeline-axis: block;
+
+  animation-timeline: --image;
+  animation-name: show;
+
+  animation-range: entry 0% cover 80%;
+  animation-fill-mode: both;
+}
