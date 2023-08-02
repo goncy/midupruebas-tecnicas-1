@@ -4,6 +4,9 @@ import api from "@/api";
 
 import IndexLoadingPage from "./loading";
 
+// We import this component with next/dynamic and ssr false to avoid
+// flashing of the ⭐ icons when the page is loaded as those are loaded
+// from localStorage and the data is not available on the server.
 const IndexClientPage = dynamic(() => import("./client"), {ssr: false, loading: IndexLoadingPage});
 
 // This is a server component that takes care of fetching the books from the API
