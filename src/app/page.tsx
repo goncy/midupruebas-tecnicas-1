@@ -1,6 +1,10 @@
+import dynamic from "next/dynamic";
+
 import api from "@/api";
 
-import HomeClient from "./client";
+import IndexLoadingPage from "./loading";
+
+const IndexClientPage = dynamic(() => import("./client"), {ssr: false, loading: IndexLoadingPage});
 
 // This is a server component that takes care of fetching the books from the API
 // and passing them to the client component. As the rest of the data depends
@@ -12,5 +16,5 @@ import HomeClient from "./client";
 export default async function Home() {
   const books = await api.book.list();
 
-  return <HomeClient books={books} />;
+  return <IndexClientPage books={books} />;
 }

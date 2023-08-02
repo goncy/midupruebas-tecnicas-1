@@ -3,7 +3,7 @@
 // But if some day we start fetching books from an external service, this screen
 // will show up without touching anything.
 
-export default function Loading() {
+export default function IndexLoadingPage() {
   return (
     <div role="status">
       <svg
